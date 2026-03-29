@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dasato — Interaktívna Príručka</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:#ffffff; --bg2:#f7f7f5; --bg3:#f0f0ec; --bg4:#e8e8e3;
+  --ink:#111111; --ink2:#444444; --ink3:#888888; --ink4:#bbbbbb;
+  --yellow:#f5c400; --yellow2:#ffd740;
+  --yellow-a:rgba(245,196,0,0.12); --yellow-b:rgba(245,196,0,0.06);
+  --pink:#e8175d; --pink2:#ff3d7a;
+  --pink-a:rgba(232,23,93,0.10); --pink-b:rgba(232,23,93,0.06);
+  --border:#e5e5e0; --border2:#d0d0c8;
+  --green:#16a34a; --green-a:rgba(22,163,74,0.10);
+  --red:#dc2626; --red-a:rgba(220,38,38,0.08);
+  --blue:#2563eb; --blue-a:rgba(37,99,235,0.08);
+  --r:10px; --r2:6px;
+  --shadow-sm:0 1px 4px rgba(0,0,0,0.06),0 2px 12px rgba(0,0,0,0.04);
+  --shadow:0 4px 24px rgba(0,0,0,0.08),0 1px 4px rgba(0,0,0,0.04);
+  --shadow-lg:0 16px 48px rgba(0,0,0,0.12);
+  --topbar-h:64px;
+}
+html,body { min-height:100%; background:var(--bg); color:var(--ink); font-family:'Barlow',sans-serif; font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased; }
+#root { display:flex; flex-direction:column; min-height:100vh; }
+.app { display:flex; flex-direction:column; min-height:100vh; }
+.body { display:flex; flex:1; }
+.topbar { height:var(--topbar-h); background:var(--bg); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 24px; gap:16px; position:sticky; top:0; z-index:200; box-shadow:var(--shadow-sm); }
+.topbar-logo { display:flex; align-items:center; gap:9px; flex-shrink:0; cursor:pointer; }
+.logo-gem { width:22px; height:22px; background:var(--yellow); clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%); flex-shrink:0; }
+.logo-wordmark { font-family:'Barlow Condensed',sans-serif; font-size:20px; font-weight:900; letter-spacing:2px; text-transform:uppercase; color:var(--ink); }
+.topbar-divider { width:1px; height:28px; background:var(--border); flex-shrink:0; }
+.topbar-label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:1.5px; color:var(--ink3); flex-shrink:0; }
+.timeline-wrap { flex:1; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.timeline { display:flex; align-items:center; }
+.tl-step { display:flex; align-items:center; cursor:pointer; }
+.tl-node { display:flex; flex-direction:column; align-items:center; gap:4px; padding:0 4px; transition:all 0.15s; }
+.tl-circle { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:800; border:2px solid var(--border2); background:var(--bg); color:var(--ink3); transition:all 0.2s; flex-shrink:0; }
+.tl-circle.done { background:var(--yellow); border-color:var(--yellow); color:var(--ink); }
+.tl-circle.active { background:var(--ink); border-color:var(--ink); color:var(--yellow); box-shadow:0 0 0 3px var(--yellow-a); }
+.tl-label { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.8px; color:var(--ink4); white-space:nowrap; transition:color 0.15s; }
+.tl-label.done { color:var(--ink2); }
+.tl-label.active { color:var(--ink); font-weight:700; }
+.tl-step:hover .tl-circle:not(.active) { border-color:var(--pink); color:var(--pink); }
+.tl-step:hover .tl-label { color:var(--pink); }
+.tl-line { width:40px; height:2px; background:var(--border); flex-shrink:0; position:relative; overflow:hidden; }
+.tl-line-fill { position:absolute; left:0; top:0; height:100%; background:var(--yellow); transition:width 0.35s; }
+.nav-arrows { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.arrow-btn { width:36px; height:36px; border-radius:50%; border:1.5px solid var(--border2); background:var(--bg); color:var(--ink2); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.15s; font-size:15px; line-height:1; }
+.arrow-btn:hover:not(:disabled) { border-color:var(--pink); color:var(--pink); background:var(--pink-b); }
+.arrow-btn:disabled { opacity:0.3; cursor:not-allowed; }
+.sidebar { width:230px; background:var(--bg2); border-right:1px solid var(--border); padding:28px 0; flex-shrink:0; position:sticky; top:var(--topbar-h); height:calc(100vh - var(--topbar-h)); overflow-y:auto; }
+.nav-item { display:flex; align-items:center; gap:10px; padding:9px 20px; font-size:13px; font-weight:500; color:var(--ink3); cursor:pointer; transition:all 0.12s; border-left:3px solid transparent; }
+.nav-item:hover { background:var(--bg3); color:var(--ink); }
+.nav-item.active { background:var(--yellow-b); color:var(--ink); font-weight:700; border-left-color:var(--yellow); }
+.pip { width:6px; height:6px; border-radius:50%; background:var(--border2); flex-shrink:0; }
+.pip.done { background:var(--green); }
+.pip.yellow { background:var(--yellow); }
+.sidebar-footer { margin-top:32px; padding:20px; border-top:1px solid var(--border); }
+.sidebar-quote { font-size:11px; font-style:italic; color:var(--ink4); line-height:1.6; }
+.main { flex:1; overflow-y:auto; background:var(--bg); }
+.page { max-width:820px; margin:0 auto; padding:48px 44px 80px; }
+.eyebrow { display:inline-flex; align-items:center; gap:7px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2.5px; color:var(--pink); margin-bottom:12px; }
+.eyebrow::before { content:''; display:block; width:7px; height:7px; background:var(--pink); clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%); }
+.page-title { font-family:'Barlow Condensed',sans-serif; font-size:52px; font-weight:900; line-height:1; text-transform:uppercase; letter-spacing:-0.5px; color:var(--ink); margin-bottom:12px; }
+.page-title em { color:var(--pink); font-style:normal; }
+.page-desc { font-size:14px; color:var(--ink3); max-width:520px; line-height:1.75; margin-bottom:36px; }
+.card { background:var(--bg); border:1px solid var(--border); border-radius:var(--r); padding:26px 28px; margin-bottom:18px; box-shadow:var(--shadow-sm); }
+.card-eyebrow { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:2.5px; color:var(--pink); margin-bottom:6px; }
+.card-title { font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:800; text-transform:uppercase; color:var(--ink); margin-bottom:4px; }
+.card-desc { font-size:13px; color:var(--ink3); margin-bottom:20px; line-height:1.6; }
+.textarea { width:100%; background:var(--bg2); border:1.5px solid var(--border); border-radius:var(--r2); padding:13px 15px; color:var(--ink); font-family:'Barlow',sans-serif; font-size:14px; line-height:1.7; resize:vertical; min-height:120px; outline:none; transition:border-color 0.15s; }
+.textarea:focus { border-color:var(--pink); background:var(--bg); }
+.textarea::placeholder { color:var(--ink4); }
+.textarea.error { border-color:var(--red); }
+.input { width:100%; background:var(--bg2); border:1.5px solid var(--border); border-radius:var(--r2); padding:10px 14px; color:var(--ink); font-family:'Barlow',sans-serif; font-size:14px; outline:none; transition:border-color 0.15s; }
+.input:focus { border-color:var(--pink); background:var(--bg); }
+.input::placeholder { color:var(--ink4); }
+.char-count { font-size:11px; color:var(--ink4); text-align:right; margin-top:5px; }
+.btn { display:inline-flex; align-items:center; gap:7px; padding:10px 22px; border-radius:var(--r2); font-family:'Barlow',sans-serif; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.12s; border:none; text-transform:uppercase; letter-spacing:1.5px; }
+.btn-yellow { background:var(--yellow); color:var(--ink); }
+.btn-yellow:hover { background:var(--yellow2); box-shadow:0 4px 16px rgba(245,196,0,0.35); transform:translateY(-1px); }
+.btn-pink { background:var(--pink); color:#fff; }
+.btn-pink:hover { background:var(--pink2); box-shadow:0 4px 16px rgba(232,23,93,0.3); transform:translateY(-1px); }
+.btn-outline { background:transparent; color:var(--ink2); border:1.5px solid var(--border2); }
+.btn-outline:hover { border-color:var(--pink); color:var(--pink); }
+.btn-stuck { background:var(--pink-b); color:var(--pink); border:1.5px solid rgba(232,23,93,0.2); font-size:11px; padding:8px 16px; }
+.btn-stuck:hover { background:var(--pink-a); }
+.ai-box { background:var(--bg2); border:1.5px solid var(--border); border-left:3px solid var(--yellow); border-radius:var(--r2); padding:13px 17px; margin-top:14px; }
+.ai-box.pink { border-left-color:var(--pink); }
+.ai-box.green { border-left-color:var(--green); }
+.ai-box.red { border-left-color:var(--red); }
+.ai-tag { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:var(--yellow); margin-bottom:5px; }
+.ai-tag.pink { color:var(--pink); }
+.ai-tag.green { color:var(--green); }
+.ai-tag.red { color:var(--red); }
+.ai-text { font-size:13px; color:var(--ink2); line-height:1.7; }
+.quote-box { background:linear-gradient(135deg,var(--yellow-b),var(--pink-b)); border:1.5px solid var(--border); border-radius:var(--r); padding:18px 22px; margin-top:14px; }
+.quote-label { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:2.5px; color:var(--pink); margin-bottom:7px; }
+.quote-text { font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:800; text-transform:uppercase; color:var(--ink); line-height:1.3; }
+.quote-text em { color:var(--pink); font-style:normal; }
+.prog-wrap { margin-bottom:20px; }
+.prog-top { display:flex; justify-content:space-between; margin-bottom:7px; }
+.prog-lbl { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:1.5px; color:var(--ink3); }
+.prog-val { font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:800; color:var(--pink); }
+.prog-bar { height:4px; background:var(--bg3); border-radius:2px; overflow:hidden; }
+.prog-fill { height:100%; background:var(--yellow); border-radius:2px; transition:width 0.35s; }
+.check-row { display:flex; align-items:flex-start; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); }
+.check-row:last-child { border-bottom:none; }
+.check-box { width:18px; height:18px; border-radius:4px; border:2px solid var(--border2); background:transparent; cursor:pointer; flex-shrink:0; margin-top:2px; appearance:none; transition:all 0.12s; position:relative; }
+.check-box:checked { background:var(--yellow); border-color:var(--yellow); }
+.check-box:checked::after { content:''; position:absolute; left:3px; top:0px; width:5px; height:9px; border:2px solid var(--ink); border-top:none; border-left:none; transform:rotate(45deg); }
+.check-label { font-size:13px; color:var(--ink2); line-height:1.55; }
+.check-label.done { color:var(--ink4); text-decoration:line-through; }
+.drag-item { display:flex; align-items:center; gap:12px; padding:11px 14px; background:var(--bg2); border:1.5px solid var(--border); border-radius:var(--r2); margin-bottom:7px; cursor:grab; transition:border-color 0.12s; }
+.drag-item:hover { box-shadow:var(--shadow-sm); }
+.drag-item.dragover { border-color:var(--pink); background:var(--pink-b); }
+.drag-item.dragging { opacity:0.3; }
+.drag-handle { color:var(--ink4); font-size:13px; user-select:none; }
+.drag-text { flex:1; font-size:13px; color:var(--ink); }
+.level-badge { font-size:9px; text-transform:uppercase; letter-spacing:1px; font-weight:700; padding:3px 9px; border-radius:999px; flex-shrink:0; }
+.lv-green { background:var(--green-a); color:var(--green); border:1px solid rgba(22,163,74,0.2); }
+.lv-blue { background:var(--blue-a); color:var(--blue); border:1px solid rgba(37,99,235,0.2); }
+.lv-red { background:var(--red-a); color:var(--red); border:1px solid rgba(220,38,38,0.2); }
+.mentor-grid { display:grid; grid-template-columns:1fr 1fr; gap:13px; }
+.mentor-card { background:var(--bg2); border:1.5px solid var(--border); border-radius:var(--r2); padding:16px 18px; }
+.mentor-name { font-size:12px; font-weight:700; color:var(--ink); margin-bottom:10px; text-transform:uppercase; letter-spacing:0.5px; }
+.call-dots { display:flex; gap:7px; }
+.call-dot { width:26px; height:26px; border-radius:50%; border:2px solid var(--border2); background:var(--bg); cursor:pointer; transition:all 0.12s; }
+.call-dot.done { background:var(--yellow); border-color:var(--yellow); }
+.call-dot:hover:not(.done) { border-color:var(--pink); }
+.sol-row { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+.sol-num { font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:800; color:var(--ink4); min-width:22px; }
+.slider-wrap { display:flex; align-items:center; gap:8px; }
+.slider-val { font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:800; color:var(--pink); min-width:20px; text-align:center; }
+input[type=range] { -webkit-appearance:none; appearance:none; height:4px; background:var(--bg3); border-radius:2px; outline:none; width:88px; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:var(--pink); cursor:pointer; }
+.stat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:13px; margin-bottom:30px; }
+.stat-tile { background:var(--bg); border:1.5px solid var(--border); border-radius:var(--r); padding:20px 22px; box-shadow:var(--shadow-sm); }
+.stat-num { font-family:'Barlow Condensed',sans-serif; font-size:44px; font-weight:900; line-height:1; margin-bottom:4px; }
+.stat-num.yellow { color:var(--yellow); }
+.stat-num.pink { color:var(--pink); }
+.stat-lbl { font-size:10px; text-transform:uppercase; letter-spacing:2px; color:var(--ink3); font-weight:700; }
+.mod-row { display:flex; align-items:center; gap:18px; padding:18px 22px; background:var(--bg); border:1.5px solid var(--border); border-radius:var(--r); margin-bottom:11px; cursor:pointer; transition:all 0.15s; box-shadow:var(--shadow-sm); }
+.mod-row:hover { border-color:var(--pink); box-shadow:0 4px 20px rgba(232,23,93,0.08); }
+.mod-num { font-family:'Barlow Condensed',sans-serif; font-size:40px; font-weight:900; color:var(--ink4); line-height:1; min-width:44px; }
+.mod-info { flex:1; }
+.mod-title { font-size:14px; font-weight:700; color:var(--ink); text-transform:uppercase; letter-spacing:0.5px; }
+.mod-sub { font-size:12px; color:var(--ink3); margin-top:3px; }
+.sbadge { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; padding:4px 12px; border-radius:999px; }
+.sb-todo { background:var(--bg3); color:var(--ink3); border:1px solid var(--border); }
+.sb-active { background:var(--yellow-a); color:var(--ink); border:1px solid rgba(245,196,0,0.3); }
+.sb-done { background:var(--green-a); color:var(--green); border:1px solid rgba(22,163,74,0.2); }
+.top3-card { background:var(--bg); border:1.5px solid var(--border); border-radius:var(--r); padding:22px 24px; margin-bottom:14px; box-shadow:var(--shadow-sm); }
+.top3-tag { font-size:9px; text-transform:uppercase; letter-spacing:2px; font-weight:700; color:var(--pink); margin-bottom:10px; }
+.analytic-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+.analytic-label { display:block; font-size:9px; text-transform:uppercase; letter-spacing:2px; font-weight:700; color:var(--ink3); margin-bottom:5px; }
+.sel-row { display:flex; align-items:center; gap:14px; padding:13px 0; border-bottom:1px solid var(--border); cursor:pointer; }
+.sel-row:last-child { border-bottom:none; }
+.sel-row:hover .sel-text { color:var(--pink); }
+.sel-text { flex:1; font-size:13px; color:var(--ink2); transition:color 0.12s; }
+.sel-check { width:16px; height:16px; border-radius:4px; border:2px solid var(--border2); background:transparent; cursor:pointer; appearance:none; flex-shrink:0; transition:all 0.12s; }
+.sel-check:checked { background:var(--pink); border-color:var(--pink); }
+.score-pips { display:flex; gap:3px; }
+.pip-dot { width:7px; height:7px; border-radius:2px; }
+.export-box { background:var(--ink); color:#fff; border-radius:var(--r); padding:40px; text-align:center; position:relative; overflow:hidden; }
+.export-box::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg,var(--yellow),var(--pink)); }
+.export-title { font-family:'Barlow Condensed',sans-serif; font-size:32px; font-weight:900; text-transform:uppercase; color:#fff; margin-bottom:8px; }
+.export-sub { font-size:13px; color:rgba(255,255,255,0.6); margin-bottom:26px; }
+.fb-counter { display:flex; align-items:baseline; gap:12px; margin-bottom:20px; }
+.fb-num { font-family:'Barlow Condensed',sans-serif; font-size:56px; font-weight:900; color:var(--pink); line-height:1; }
+.fb-lbl { font-size:13px; color:var(--ink3); }
+.toast { position:fixed; bottom:24px; right:24px; width:300px; z-index:300; animation:slideUp 0.22s ease; }
+.toast-inner { background:var(--bg); border:1.5px solid var(--border); border-top:3px solid var(--pink); border-radius:var(--r); padding:15px 17px; box-shadow:var(--shadow-lg); position:relative; }
+.toast-close { position:absolute; top:11px; right:13px; background:none; border:none; color:var(--ink3); cursor:pointer; font-size:15px; line-height:1; }
+@keyframes slideUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+.row-flex { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.row-right { display:flex; justify-content:flex-end; gap:10px; margin-top:22px; }
+.divider { border:none; border-top:1px solid var(--border); margin:28px 0; }
+@media(max-width:760px){
+  .sidebar{display:none;}
+  .page{padding:28px 18px 60px;}
+  .stat-grid{grid-template-columns:1fr 1fr;}
+  .mentor-grid{grid-template-columns:1fr;}
+  .analytic-grid{grid-template-columns:1fr;}
+  .page-title{font-size:38px;}
+  .tl-label{display:none;}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState } = React;
+
+const STEPS = [
+  { key:"m0", short:"Úvod",      full:"Vstupná brána" },
+  { key:"m1", short:"Týždeň 1",  full:"Analýza a dáta" },
+  { key:"m2", short:"Týždeň 2",  full:"Validácia" },
+  { key:"m3", short:"Týždeň 3",  full:"Realizácia" },
+];
+
+const CITAT = "Nevedomosť nie je chyba... chyba je nehľadať vedomosť po riešení.";
+
+const AI_STUCK = [
+  "To je v poriadku — nevedomosť je začiatkom poznania. Začni od toho, čo vieš určite, a budujeme ďalej.",
+  "Zaseknutie nie je zlyhanie. Narazil si na niečo dôležité. Skús rozmeniť problém na menšie časti.",
+  "Každý skúsený zakladateľ bol tu, kde si teraz. Ktorú jednu vec môžeš overiť zajtra?",
+  "Toto je presne ten moment, pre ktorý existuje mentoring. Pýtaj sa správne otázky.",
+];
+
+const ANALYZA = [
+  { min:0,   max:60,   text:"Príliš krátke. Dobrá definícia obsahuje: kto je postihnutý, čo sa deje a prečo na tom záleží. Skús 3–4 vety s konkrétnym kontextom." },
+  { min:61,  max:160,  text:"Dobrý začiatok. Pridaj konkrétne dáta alebo priamy citát z rozhovoru. Tu potrebujeme ísť hlbšie — skús sa zamerať na dáta z druhého callu." },
+  { min:161, max:420,  text:"Solidná definícia. Uisti sa, že je v nej jasné: PRE KOHO problém existuje, AKO ČASTO sa deje a ČO by bolo inak bez neho." },
+  { min:421, max:9999, text:"Výborné. Teraz opačný extrém: dokážeš to isté zhrnúť v jednej vete? Ak vieš, pochopil si jadro." },
+];
+
+const initChecklist = [
+  { id:"k1", label:"Definoval som kontext problému (trh, situácia, prostredie)", done:false },
+  { id:"k2", label:"Identifikoval som cieľovú skupinu a jej špecifické potreby", done:false },
+  { id:"k3", label:"Zberal som kvantitatívne dáta (aspoň 1 overený zdroj)", done:false },
+  { id:"k4", label:"Vykonal som aspoň 3 rozhovory s potenciálnym používateľom", done:false },
+  { id:"k5", label:"Analyzoval som existujúce riešenia na trhu", done:false },
+  { id:"k6", label:"Jasne som formuloval hlavný pain point (koreň, nie symptóm)", done:false },
+];
+
+const initKnowledge = [
+  { id:1, text:"Rozhovory s používateľmi (priamy výskum)", level:"overene" },
+  { id:2, text:"Dáta z analytických nástrojov", level:"overene" },
+  { id:3, text:"Sekundárny výskum (články, štúdie)", level:"ciastocne" },
+  { id:4, text:"Názory z vlastnej skúsenosti", level:"domienky" },
+  { id:5, text:"Predpoklady o trhu", level:"domienky" },
+];
+
+const initSolutions = [1,2,3,4,5].map(id => ({ id, text:"", score:3 }));
+
+/* ── SHARED ── */
+function QuoteBox() {
+  return (
+    <div className="quote-box">
+      <div className="quote-label">Filozofia Dasato</div>
+      <div className="quote-text">Nevedomosť nie je chyba... <em>chyba je nehľadať vedomosť po riešení.</em></div>
+    </div>
+  );
+}
+function StuckBtn({ onClick }) {
+  return <button className="btn btn-stuck" onClick={onClick}>Tu sme sa zasekli</button>;
+}
+function Toast({ msg, onClose }) {
+  if (!msg) return null;
+  return (
+    <div className="toast">
+      <div className="toast-inner">
+        <button className="toast-close" onClick={onClose}>✕</button>
+        <div className="ai-tag pink" style={{marginBottom:6}}>AI Coach</div>
+        <div className="ai-text">{msg}</div>
+      </div>
+    </div>
+  );
+}
+
+/* ── TOPBAR ── */
+function Topbar({ active, onNav, status }) {
+  const keys = ["m0","m1","m2","m3"];
+  const idx  = keys.indexOf(active);
+  const isDash = active === "dashboard";
+  const goBack = () => { if(isDash) return; onNav(idx<=0?"dashboard":keys[idx-1]); };
+  const goFwd  = () => { if(isDash){onNav("m0");return;} if(idx<keys.length-1) onNav(keys[idx+1]); };
+  return (
+    <header className="topbar">
+      <div className="topbar-logo" onClick={()=>onNav("dashboard")}>
+        <div className="logo-gem"/>
+        <span className="logo-wordmark">Dasato</span>
+      </div>
+      <div className="topbar-divider"/>
+      <span className="topbar-label">Príručka</span>
+      <div className="timeline-wrap">
+        <div className="timeline">
+          {STEPS.map((step,i) => {
+            const st = status[step.key]||"todo";
+            const isActive = active===step.key;
+            const isDone   = st==="done";
+            return (
+              <div key={step.key} className="tl-step" onClick={()=>onNav(step.key)}>
+                <div className="tl-node">
+                  <div className={`tl-circle${isActive?" active":isDone?" done":""}`}>
+                    {isDone&&!isActive?"✓":i+1}
+                  </div>
+                  <div className={`tl-label${isActive?" active":isDone?" done":""}`}>{step.short}</div>
+                </div>
+                {i<STEPS.length-1 && (
+                  <div className="tl-line">
+                    <div className="tl-line-fill" style={{width:isDone?"100%":"0%"}}/>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div className="nav-arrows">
+        <button className="arrow-btn" onClick={goBack} disabled={isDash} title="Späť">←</button>
+        <button className="arrow-btn" onClick={goFwd} disabled={!isDash&&idx>=keys.length-1} title="Ďalej">→</button>
+      </div>
+    </header>
+  );
+}
+
+/* ── SIDEBAR ── */
+function Sidebar({ active, onNav, status }) {
+  const items = [
+    { key:"dashboard", label:"Dashboard" },
+    { key:"m0", label:"Modul 0 — Vstupná brána" },
+    { key:"m1", label:"Týždeň 1 — Analýza" },
+    { key:"m2", label:"Týždeň 2 — Validácia" },
+    { key:"m3", label:"Týždeň 3 — Realizácia" },
+  ];
+  return (
+    <nav className="sidebar">
+      <div style={{padding:"0 20px 14px",fontSize:9,fontWeight:700,textTransform:"uppercase",letterSpacing:"2.5px",color:"var(--ink4)"}}>Navigácia</div>
+      {items.map(item => {
+        const st = item.key==="dashboard"?"done":(status[item.key]||"todo");
+        const isActive = active===item.key;
+        return (
+          <div key={item.key} className={`nav-item${isActive?" active":""}`} onClick={()=>onNav(item.key)}>
+            <div className={`pip${isActive?" yellow":st==="done"?" done":""}`}/>
+            {item.label}
+          </div>
+        );
+      })}
+      <div className="sidebar-footer">
+        <div className="sidebar-quote">"{CITAT}"</div>
+      </div>
+    </nav>
+  );
+}
+
+/* ── DASHBOARD ── */
+function Dashboard({ onNav, status }) {
+  const mods = [
+    { key:"m0", n:"0", title:"Vstupná brána",             sub:"Definícia problému, vzorové zadanie" },
+    { key:"m1", n:"1", title:"Týždeň 1 — Analýza a dáta", sub:"Checklist, zoradenie vedomostí, mentori" },
+    { key:"m2", n:"2", title:"Týždeň 2 — Validácia",      sub:"Feedback hub, brainstorming, scoring, report" },
+    { key:"m3", n:"3", title:"Týždeň 3 — Realizácia",     sub:"Top 3 riešenia, analytické karty, export" },
+  ];
+  const done = mods.filter(m=>status[m.key]==="done").length;
+  return (
+    <div className="page">
+      <div className="eyebrow">Dasato Program</div>
+      <h1 className="page-title">Interaktívna<br/><em>Príručka</em></h1>
+      <p className="page-desc">Tvoj sprievodca tromi týždňami — od prvej definície problému až po finálnu dokumentáciu riešenia pripraveného na prezentáciu.</p>
+      <div className="stat-grid">
+        <div className="stat-tile">
+          <div className="stat-num yellow">{done}</div>
+          <div className="stat-lbl">Modulov hotových</div>
+          <div className="prog-bar" style={{marginTop:12}}>
+            <div className="prog-fill" style={{width:`${(done/mods.length)*100}%`}}/>
+          </div>
+        </div>
+        <div className="stat-tile"><div className="stat-num pink">{mods.length}</div><div className="stat-lbl">Celkový počet modulov</div></div>
+        <div className="stat-tile"><div className="stat-num" style={{color:"var(--ink)",fontSize:28,fontStyle:"italic"}}>3 týždne</div><div className="stat-lbl">Dĺžka sprintu</div></div>
+      </div>
+      {mods.map(m => {
+        const s = status[m.key]||"todo";
+        return (
+          <div key={m.key} className="mod-row" onClick={()=>onNav(m.key)}>
+            <div className="mod-num">{m.n}</div>
+            <div className="mod-info"><div className="mod-title">{m.title}</div><div className="mod-sub">{m.sub}</div></div>
+            <span className={`sbadge ${s==="done"?"sb-done":s==="active"?"sb-active":"sb-todo"}`}>{s==="done"?"Hotovo":s==="active"?"Prebieha":"Čaká"}</span>
+          </div>
+        );
+      })}
+      <QuoteBox/>
+    </div>
+  );
+}
+
+/* ── MODULE 0 ── */
+function Module0({ onComplete }) {
+  const [text,setText]   = useState("");
+  const [fb,setFb]       = useState(null);
+  const [toast,setToast] = useState(null);
+  const [showQ,setShowQ] = useState(false);
+  const analyse = () => { const len=text.trim().length; setFb(ANALYZA.find(a=>len>=a.min&&len<=a.max)?.text||""); };
+  const stuck   = () => { setToast(AI_STUCK[Math.floor(Math.random()*AI_STUCK.length)]); setShowQ(true); };
+  return (
+    <div className="page">
+      <Toast msg={toast} onClose={()=>setToast(null)}/>
+      <div className="eyebrow">Modul 0</div>
+      <h1 className="page-title">Vstupná<br/><em>Brána</em></h1>
+      <p className="page-desc">Pred tým, ako začneme, potrebujeme vedieť, čo riešiš. Táto časť je tvoja kotva — k nej sa budeme vracať počas celého programu.</p>
+      <div className="card">
+        <div className="card-eyebrow">Vzorové zadanie</div>
+        <div className="card-title">Ako vyzerá ideálny výstup</div>
+        <div className="card-desc">Toto je referenčný bod. Takto vyzerá správne spracovaná definícia problému.</div>
+        <div style={{background:"var(--bg2)",border:"1.5px solid var(--border)",borderLeft:"3px solid var(--yellow)",borderRadius:"var(--r2)",padding:"17px 20px"}}>
+          <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:"2.5px",fontWeight:700,color:"var(--yellow)",marginBottom:9}}>Príklad — Vzdelávanie</div>
+          <p style={{fontSize:13,color:"var(--ink2)",lineHeight:1.8}}>Študenti vysokých škôl v SR (18–25 rokov) majú problém nájsť relevantné praktické skúsenosti počas štúdia. Podľa vlastného prieskumu 7 z 10 študentov nikdy neuzavrelo zmluvu o spolupráci s firmou pred koncom štúdia. Firmy na druhej strane hlásia, že absolventi prichádzajú nepripravení na reálnu prácu. Tento gap vznikol pretože akademické kurzy nereflektujú trh. Riešenie by malo znásobiť kontakt medzi študentmi a trhom ešte počas štúdia.</p>
+        </div>
+      </div>
+      <div className="card">
+        <div className="card-eyebrow">Tvoja definícia</div>
+        <div className="card-title">Definuj problém v jednom odseku</div>
+        <div className="card-desc">Konkrétne, bez obalu. Použi to, čo si sa dozvedel z rozhovorov — nie čo si myslíš.</div>
+        <textarea className="textarea" style={{minHeight:160}} placeholder="Opíš problém: kto ho má, prečo existuje, čo by bolo inak keby neexistoval..." value={text} onChange={e=>{setText(e.target.value);setFb(null);}}/>
+        <div className="char-count">{text.length} znakov</div>
+        <div className="row-flex" style={{marginTop:14}}>
+          {text.trim().length===0
+            ? <button className="btn btn-outline" onClick={()=>{setShowQ(true);setToast("Začni tým, čo vieš určite. Opíš situáciu, ktorú si videl na vlastné oči.");}}>Neviem, ako začať</button>
+            : <button className="btn btn-yellow" onClick={analyse}>Analyzovať definíciu</button>
+          }
+          <StuckBtn onClick={stuck}/>
+        </div>
+        {fb && <div className="ai-box"><div className="ai-tag">AI Feedback</div><div className="ai-text">{fb}</div></div>}
+        {showQ && <QuoteBox/>}
+      </div>
+      <div className="row-right"><button className="btn btn-pink" onClick={onComplete}>Pokračovať na Týždeň 1 →</button></div>
+    </div>
+  );
+}
+
+/* ── MODULE 1 ── */
+function Module1({ onComplete }) {
+  const [checklist,setCheck] = useState(initChecklist);
+  const [items,setItems]     = useState(initKnowledge);
+  const [dragIdx,setDrag]    = useState(null);
+  const [overIdx,setOver]    = useState(null);
+  const [mentor,setMentor]   = useState({dasato:[false,false,false],m1:[false,false],m2:[false,false]});
+  const [toast,setToast]     = useState(null);
+  const [showQ,setShowQ]     = useState(false);
+  const done = checklist.filter(c=>c.done).length;
+  const toggle = id => setCheck(p=>p.map(c=>c.id===id?{...c,done:!c.done}:c));
+  const toggleM = (g,i) => setMentor(p=>{const a=[...p[g]];a[i]=!a[i];return{...p,[g]:a};});
+  const stuck = () => { setToast(AI_STUCK[Math.floor(Math.random()*AI_STUCK.length)]); setShowQ(true); };
+  const onDragStart=i=>setDrag(i);
+  const onDragOver=(e,i)=>{e.preventDefault();setOver(i);};
+  const onDrop=(e,i)=>{e.preventDefault();if(dragIdx===null||dragIdx===i){setDrag(null);setOver(null);return;}const a=[...items];const[r]=a.splice(dragIdx,1);a.splice(i,0,r);setItems(a);setDrag(null);setOver(null);};
+  return (
+    <div className="page">
+      <Toast msg={toast} onClose={()=>setToast(null)}/>
+      <div className="eyebrow">Modul 1 — Týždeň 1</div>
+      <h1 className="page-title">Analýza<br/><em>a Dáta</em></h1>
+      <p className="page-desc">Prvý týždeň je o porozumení. Neriešiš — zbieraš, overuješ, pýtaš sa. Každá odpoveď musí byť podložená dátami alebo priamym citátom z rozhovoru.</p>
+      <div className="card">
+        <div className="card-eyebrow">Povinné kroky</div>
+        <div className="card-title">Checklist analýzy</div>
+        <div className="card-desc">Označ body, ktoré si splnil. Pred prechodom na Týždeň 2 musia byť všetky odškrtnuté.</div>
+        <div className="prog-wrap">
+          <div className="prog-top"><span className="prog-lbl">Postup</span><span className="prog-val">{done} / {checklist.length}</span></div>
+          <div className="prog-bar"><div className="prog-fill" style={{width:`${(done/checklist.length)*100}%`}}/></div>
+        </div>
+        {checklist.map(c=>(
+          <div key={c.id} className="check-row">
+            <input type="checkbox" className="check-box" checked={c.done} onChange={()=>toggle(c.id)}/>
+            <span className={`check-label${c.done?" done":""}`}>{c.label}</span>
+          </div>
+        ))}
+        <div className="row-flex" style={{marginTop:14}}><StuckBtn onClick={stuck}/></div>
+        {showQ && <QuoteBox/>}
+      </div>
+      <div className="card">
+        <div className="card-eyebrow">Vedomostná mapa</div>
+        <div className="card-title">Zoradenie vedomostí</div>
+        <div className="card-desc">Pretiahni položky tak, aby boli zoradené od najoverenejšieho zdroja (hore) po čisté domienky (dole).</div>
+        {items.map((item,idx)=>(
+          <div key={item.id}
+            className={`drag-item${dragIdx===idx?" dragging":""}${overIdx===idx&&dragIdx!==idx?" dragover":""}`}
+            draggable onDragStart={()=>onDragStart(idx)} onDragOver={e=>onDragOver(e,idx)} onDrop={e=>onDrop(e,idx)} onDragEnd={()=>{setDrag(null);setOver(null);}}>
+            <span className="drag-handle">::</span>
+            <span style={{fontSize:12,color:"var(--ink4)",minWidth:18}}>{idx+1}.</span>
+            <span className="drag-text">{item.text}</span>
+            <span className={`level-badge ${item.level==="overene"?"lv-green":item.level==="ciastocne"?"lv-blue":"lv-red"}`}>
+              {item.level==="overene"?"Overené":item.level==="ciastocne"?"Čiastočné":"Domienka"}
+            </span>
+          </div>
+        ))}
+        <div className="ai-box"><div className="ai-tag">Tip</div><div className="ai-text">Čím vyššie je položka, tým silnejší argument tvoríš. Riešenia postavené na overených dátach prežívajú.</div></div>
+      </div>
+      <div className="card">
+        <div className="card-eyebrow">Komunikácia</div>
+        <div className="card-title">Mentori a Cally</div>
+        <div className="card-desc">Zaznaménaj absolvované cally. Prvý týždeň plánuje 2–3 cally s Dasato tímom a 2 cally s mentormi z praxe.</div>
+        <div className="mentor-grid">
+          {[{key:"dasato",name:"Dasato Team",count:3},{key:"m1",name:"Mentor z praxe 1",count:2},{key:"m2",name:"Mentor z praxe 2",count:2}].map(m=>(
+            <div key={m.key} className="mentor-card">
+              <div className="mentor-name">{m.name}</div>
+              <div style={{fontSize:10,color:"var(--ink4)",marginBottom:10,textTransform:"uppercase",letterSpacing:"1px"}}>Plánované: {m.count} cally</div>
+              <div className="call-dots">{mentor[m.key].map((d,i)=>(<div key={i} className={`call-dot${d?" done":""}`} onClick={()=>toggleM(m.key,i)}/>))}</div>
+            </div>
+          ))}
+          <div className="mentor-card" style={{border:"1.5px dashed var(--border)",background:"transparent",display:"flex",alignItems:"center",justifyContent:"center",minHeight:80,cursor:"pointer"}}>
+            <span style={{fontSize:11,color:"var(--ink4)",textTransform:"uppercase",letterSpacing:"1px"}}>+ Pridať mentora</span>
+          </div>
+        </div>
+      </div>
+      <div className="row-right"><button className="btn btn-pink" onClick={onComplete}>Pokračovať na Týždeň 2 →</button></div>
+    </div>
+  );
+}
+
+/* ── MODULE 2 ── */
+function Module2({ onComplete, onSaveSols }) {
+  const [feedbacks,setFB]  = useState([{id:1,text:""},{id:2,text:""},{id:3,text:""}]);
+  const [solutions,setSol] = useState(initSolutions.map(s=>({...s})));
+  const [report,setReport] = useState("");
+  const [warn,setWarn]     = useState(false);
+  const [toast,setToast]   = useState(null);
+  const [showQ,setShowQ]   = useState(false);
+  const updFB=(id,v)=>setFB(p=>p.map(f=>f.id===id?{...f,text:v}:f));
+  const updSol=(id,f,v)=>setSol(p=>p.map(s=>s.id===id?{...s,[f]:v}:s));
+  const stuck=()=>{setToast(AI_STUCK[Math.floor(Math.random()*AI_STUCK.length)]);setShowQ(true);};
+  const handleSubmit=()=>{ if(!report.trim()){setWarn(true);return;} onSaveSols(solutions); onComplete(); };
+  const fbDone=feedbacks.filter(f=>f.text.trim()).length;
+  return (
+    <div className="page">
+      <Toast msg={toast} onClose={()=>setToast(null)}/>
+      <div className="eyebrow">Modul 2 — Týždeň 2</div>
+      <h1 className="page-title">Validácia<br/><em>a Nápady</em></h1>
+      <p className="page-desc">Druhý týždeň je o generovaní možností a ich overovaní s ľuďmi, ktorí sú bližšie k problému ako ty. Nepripájame sa na prvé riešenie — testujeme viacere.</p>
+      <div className="card">
+        <div className="card-eyebrow">Spätná väzba</div>
+        <div className="card-title">Feedback Hub</div>
+        <div className="card-desc">Presne 3 spätné väzby — nie viac, nie menej. Viac vstupov generuje šum. Jedno pole = jeden call = jeden mentor.</div>
+        <div className="fb-counter"><span className="fb-num">{fbDone}</span><span className="fb-lbl">z 3 feedbackov vyplnených</span></div>
+        {feedbacks.map((f,i)=>(
+          <div key={f.id} style={{marginBottom:16}}>
+            <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:"2.5px",fontWeight:700,color:"var(--ink3)",marginBottom:6}}>Feedback {i+1} — {i===0?"Dasato call":`Mentor ${i}`}</div>
+            <textarea className="textarea" style={{minHeight:85}} placeholder={`Kľúčové poznatky z callu ${i+1}...`} value={f.text} onChange={e=>updFB(f.id,e.target.value)}/>
+          </div>
+        ))}
+        <StuckBtn onClick={stuck}/>
+        {showQ && <QuoteBox/>}
+      </div>
+      <div className="card">
+        <div className="card-eyebrow">Generovanie riešení</div>
+        <div className="card-title">Brainstorming Matica</div>
+        <div className="card-desc">Presne 5 návrhov riešení. Ohodnoť každé slajderom 1–5 podľa toho, ako dobre rieši hlavný pain killer z Týždňa 1.</div>
+        {solutions.map(s=>(
+          <div key={s.id} className="sol-row">
+            <div className="sol-num">{s.id}.</div>
+            <div style={{flex:1}}><input className="input" placeholder={`Riešenie ${s.id}: konkrétny nápad...`} value={s.text} onChange={e=>updSol(s.id,"text",e.target.value)}/></div>
+            <div className="slider-wrap">
+              <input type="range" min={1} max={5} step={1} value={s.score} onChange={e=>updSol(s.id,"score",Number(e.target.value))}/>
+              <div className="slider-val">{s.score}</div>
+            </div>
+          </div>
+        ))}
+        <div className="ai-box"><div className="ai-tag">Stupnica</div><div className="ai-text">1 — nerieši problém vôbec &nbsp;|&nbsp; 3 — čiastočne &nbsp;|&nbsp; 5 — priamo eliminuje hlavnú príčinu</div></div>
+      </div>
+      <div className="card">
+        <div className="card-eyebrow">Povinné pole</div>
+        <div className="card-title">Weekly Report — Týždeň 2</div>
+        <div className="card-desc">Toto nie je formalita — je to základ, na ktorý nadviažeme v Týždni 3. Bez tejto reflexie sa nedostaneš ďalej.</div>
+        <textarea className={`textarea${warn?" error":""}`} style={{minHeight:140}} placeholder="Čo sme sa tento týždeň naučili? Čo sme overili? Čo nás prekvapilo? Čo robíme inak ďalší týždeň?" value={report} onChange={e=>{setReport(e.target.value);setWarn(false);}}/>
+        {warn && (<><div className="ai-box red"><div className="ai-tag red">Upozornenie</div><div className="ai-text">Toto pole je povinné. Reflexia nie je formalita — je to najdôležitejší moment týždňa. Napiš aspoň: čo sme urobili, čo sme sa dozvedeli a čo robíme inak ďalší týždeň.</div></div><QuoteBox/></>)}
+        <div className="row-right"><StuckBtn onClick={stuck}/><button className="btn btn-pink" onClick={handleSubmit}>Uzavrieť Týždeň 2 →</button></div>
+      </div>
+    </div>
+  );
+}
+
+/* ── MODULE 3 ── */
+function Module3({ solutions }) {
+  const [selected,setSel] = useState([]);
+  const [cards,setCards]  = useState({});
+  const [exported,setExp] = useState(false);
+  const candidates = (solutions||initSolutions).filter(s=>s.text?.trim()).sort((a,b)=>b.score-a.score).slice(0,5);
+  const toggleSel = id => setSel(p=>{if(p.includes(id)) return p.filter(x=>x!==id); if(p.length>=3) return p; return[...p,id];});
+  const updCard = (id,f,v) => setCards(p=>({...p,[id]:{...(p[id]||{}),[f]:v}}));
+  const selItems = candidates.filter(s=>selected.includes(s.id));
+  return (
+    <div className="page">
+      <div className="eyebrow">Modul 3 — Týždeň 3</div>
+      <h1 className="page-title">Detailná<br/><em>Realizácia</em></h1>
+      <p className="page-desc">Posledný týždeň je o hĺbke. Vyberieš 3 najlepšie riešenia a pre každé spracuješ analytickú kartu. Výsledok je dokumentácia, ktorú môžeš zdieľať.</p>
+      <div className="card">
+        <div className="card-eyebrow">Selekcia</div>
+        <div className="card-title">Top 3 Výber</div>
+        <div className="card-desc">Vyber práve 3 riešenia, s ktorými chceš ísť hlbšie. Zoradené sú podľa skóre z Týždňa 2.</div>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
+          <span style={{fontSize:11,color:"var(--ink3)",textTransform:"uppercase",letterSpacing:"1.5px"}}>Vybrané</span>
+          <span style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:28,fontWeight:900,color:"var(--pink)",lineHeight:1}}>{selected.length} / 3</span>
+        </div>
+        {candidates.length===0
+          ? <div className="ai-box pink"><div className="ai-tag pink">Upozornenie</div><div className="ai-text">V Týždni 2 si nevyplnil riešenia. Vráť sa do Modulu 2 a doplň Brainstorming matricu.</div></div>
+          : candidates.map(s=>(
+            <div key={s.id} className="sel-row" onClick={()=>toggleSel(s.id)}>
+              <input type="checkbox" className="sel-check" checked={selected.includes(s.id)} onChange={()=>toggleSel(s.id)} onClick={e=>e.stopPropagation()}/>
+              <span className="sel-text">{s.text}</span>
+              <div className="score-pips">{Array.from({length:5}).map((_,i)=>(<div key={i} className="pip-dot" style={{background:i<s.score?"var(--yellow)":"var(--bg3)"}}/>))}</div>
+            </div>
+          ))
+        }
+      </div>
+      {selItems.map((s,idx)=>(
+        <div key={s.id} className="top3-card">
+          <div className="top3-tag">Riešenie {idx+1} z 3 — Analytická karta</div>
+          <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:20,fontWeight:800,textTransform:"uppercase",color:"var(--ink)",marginBottom:4}}>{s.text}</div>
+          <div className="analytic-grid">
+            {[
+              {key:"plusy",label:"Plusy",ph:"Silné stránky riešenia...",multi:true},
+              {key:"minusy",label:"Mínusy",ph:"Slabiny a riziká...",multi:true},
+              {key:"cas",label:"Časová náročnosť",ph:"Napr. 4–6 týždňov MVP...",multi:false},
+              {key:"rychlost",label:"Rýchlosť aplikácie v praxi",ph:"Napr. Nasaditeľné za 2 týždne...",multi:false},
+            ].map(f=>(
+              <div key={f.key}>
+                <label className="analytic-label">{f.label}</label>
+                {f.multi
+                  ? <textarea className="textarea" style={{minHeight:80}} placeholder={f.ph} value={(cards[s.id]||{})[f.key]||""} onChange={e=>updCard(s.id,f.key,e.target.value)}/>
+                  : <input className="input" placeholder={f.ph} value={(cards[s.id]||{})[f.key]||""} onChange={e=>updCard(s.id,f.key,e.target.value)}/>
+                }
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+      <hr className="divider"/>
+      <div className="export-box">
+        <div className="export-title">Export dokumentácie</div>
+        <div className="export-sub">Vygeneruj finálny dokument zo všetkých vypísaných údajov — definícia, analýza, feedback, riešenia a analytické karty.</div>
+        <div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
+          <button className="btn btn-yellow" onClick={()=>{setExp(true);window.print();}}>Exportovať do PDF</button>
+          <button className="btn" style={{background:"rgba(255,255,255,0.12)",color:"#fff",border:"1.5px solid rgba(255,255,255,0.2)"}}>Stiahnuť ako dokument</button>
+        </div>
+        {exported && (<div style={{background:"rgba(74,222,128,0.08)",border:"1px solid rgba(74,222,128,0.2)",borderRadius:"var(--r)",padding:"12px 18px",marginTop:20,textAlign:"left"}}><div style={{fontSize:9,fontWeight:700,textTransform:"uppercase",letterSpacing:"2px",color:"var(--green)",marginBottom:6}}>Hotovo</div><div style={{fontSize:13,color:"rgba(255,255,255,0.7)",lineHeight:1.7}}>Dokumentácia bola odoslaná na tlač. Gratulujeme k dokončeniu 3-týždňového sprintu Dasato programu.</div></div>)}
+      </div>
+    </div>
+  );
+}
+
+/* ── ROOT ── */
+function App() {
+  const [active,setActive]   = useState("dashboard");
+  const [status,setStatus]   = useState({m0:"todo",m1:"todo",m2:"todo",m3:"todo"});
+  const [solutions,setSols]  = useState(initSolutions.map(s=>({...s})));
+  const navigate = key => { setActive(key); window.scrollTo({top:0}); };
+  const complete = (key,next) => { setStatus(p=>({...p,[key]:"done",...(next?{[next]:"active"}:{})})); if(next) navigate(next); };
+  return (
+    <div className="app">
+      <Topbar active={active} onNav={navigate} status={status}/>
+      <div className="body">
+        <Sidebar active={active} onNav={navigate} status={status}/>
+        <main className="main">
+          {active==="dashboard" && <Dashboard onNav={navigate} status={status}/>}
+          {active==="m0"        && <Module0 onComplete={()=>complete("m0","m1")}/>}
+          {active==="m1"        && <Module1 onComplete={()=>complete("m1","m2")}/>}
+          {active==="m2"        && <Module2 onComplete={()=>complete("m2","m3")} onSaveSols={setSols}/>}
+          {active==="m3"        && <Module3 solutions={solutions}/>}
+        </main>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
